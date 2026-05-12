@@ -16,4 +16,5 @@ public interface TrabajadorRepository extends JpaRepository<Trabajador, Long> {
     Page<Trabajador> findByCategoriaIdAndCiudad(Long categoriaId, String ciudad, Pageable pageable);
     Page<Trabajador> findByCategoriaId(Long categoriaId, Pageable pageable);
     Page<Trabajador> findByCiudad(String ciudad, Pageable pageable);
+    Optional<Trabajador> findByEmail(String email);
 }

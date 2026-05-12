@@ -88,6 +88,7 @@ public class AuthServiceImpl implements IAuthService {
         trabajador.setCiudad(dto.getCiudad());
         trabajador.setPerfilVerificado(false);
         trabajador.setCategoria(categoria);
+        trabajador.setEmail(dto.getEmail());
         Trabajador saved = trabajadorRepository.save(trabajador);
 
         CustomUserDetails userDetails = new CustomUserDetails(

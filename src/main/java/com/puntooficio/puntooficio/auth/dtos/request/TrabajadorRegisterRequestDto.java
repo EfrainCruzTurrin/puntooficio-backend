@@ -14,4 +14,5 @@ public class TrabajadorRegisterRequestDto {
     private String fotoPerfil;
     private String ciudad;
     private Long categoriaId;
+    private String email;
 }

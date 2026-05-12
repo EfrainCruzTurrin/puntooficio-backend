@@ -29,6 +29,9 @@ public class Trabajador {
     @Column(nullable = false, unique = true)
     private String telefono;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
     private String password;
 

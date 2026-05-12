@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import com.puntooficio.puntooficio.shared.enums.Role;
 
 import java.util.Optional;
 
@@ -36,6 +37,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         Optional<Trabajador> trabajador = trabajadorRepository.findByTelefono(identifier);
+        if (!trabajador.isPresent()) {
+            trabajador = trabajadorRepository.findByEmail(identifier);
+        }
         if (trabajador.isPresent()) {
             return new CustomUserDetails(
                     trabajador.get().getId(),
@@ -43,6 +47,14 @@ public class CustomUserDetailsService implements UserDetailsService {
                     trabajador.get().getPassword(),
                     Role.TRABAJADOR
             );
+        }
+
+        // Y este bloque antes del throw final
+// Admin hardcodeado para desarrollo
+        if (identifier.equals("admin@puntooficio.com")) {
+            // La password se valida igual por BCrypt, se carga desde properties o hardcodeada
+            String adminPassword = "$2a$10$BU9GTmDcWrqcUeb7oyVyEuoqnnmScCaVzb3SwGjLaJhSIkE6qXclW"; // "admin1234"
+            return new CustomUserDetails(0L, identifier, adminPassword, Role.ADMIN);
         }
 
         throw new UsernameNotFoundException("Usuario no encontrado: " + identifier);
