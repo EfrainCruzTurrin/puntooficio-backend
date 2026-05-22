@@ -10,7 +10,6 @@ import com.puntooficio.puntooficio.resena.mappers.ResenaMapper;
 import com.puntooficio.puntooficio.resena.models.Resena;
 import com.puntooficio.puntooficio.resena.repositories.ResenaRepository;
 import com.puntooficio.puntooficio.shared.exceptions.ResourceNotFoundException;
-import com.puntooficio.puntooficio.trabajador.dtos.response.TrabajadorResponseDto;
 import com.puntooficio.puntooficio.trabajador.models.Trabajador;
 import com.puntooficio.puntooficio.trabajador.repositories.TrabajadorRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import com.puntooficio.puntooficio.trabajador.dtos.response.TrabajadorResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,7 +72,7 @@ class ResenaServiceImplTest {
         ClienteResponseDto clienteDto = new ClienteResponseDto(1L, "Efrain Turrin", "3533123456", "efrain@example.com");
 
         responseDto = new ResenaResponseDto(1L, 5, "Excelente trabajo", LocalDateTime.now(), trabajadorDto, clienteDto);
-        requestDto = new ResenaRequestDto(5, "Excelente trabajo", LocalDateTime.now(), 1L, 1L);
+        requestDto = new ResenaRequestDto(5, "Excelente trabajo", 1L, 1L);
     }
 
     @Test

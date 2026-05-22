@@ -8,6 +8,7 @@ import com.puntooficio.puntooficio.resena.mappers.ResenaMapper;
 import com.puntooficio.puntooficio.resena.models.Resena;
 import com.puntooficio.puntooficio.resena.repositories.ResenaRepository;
 import com.puntooficio.puntooficio.resena.services.interfaces.domain.IResenaService;
+import com.puntooficio.puntooficio.shared.exceptions.BadRequestException;
 import com.puntooficio.puntooficio.shared.exceptions.ResourceNotFoundException;
 import com.puntooficio.puntooficio.trabajador.models.Trabajador;
 import com.puntooficio.puntooficio.trabajador.repositories.TrabajadorRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,6 +43,10 @@ public class ResenaServiceImpl implements IResenaService {
         Cliente cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente", dto.getClienteId()));
         Resena resena = resenaMapper.toEntity(dto, trabajador, cliente);
+        resena.setFechaCreacion(LocalDateTime.now());
+        if (resenaRepository.existsByTrabajadorIdAndClienteId(dto.getTrabajadorId(), dto.getClienteId())) {
+            throw new BadRequestException("Ya dejaste una reseña para este trabajador.");
+        }
         return resenaMapper.toResponseDto(resenaRepository.save(resena));
     }
 

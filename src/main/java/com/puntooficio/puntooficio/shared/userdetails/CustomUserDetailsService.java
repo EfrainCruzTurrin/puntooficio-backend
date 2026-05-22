@@ -26,6 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     // si no encontramos buscamos en Trabajador por telefono.
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        // Cliente: busca por email
         Optional<Cliente> cliente = clienteRepository.findByEmail(identifier);
         if (cliente.isPresent()) {
             return new CustomUserDetails(
@@ -36,6 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             );
         }
 
+        // Trabajador: busca por teléfono, luego por email
         Optional<Trabajador> trabajador = trabajadorRepository.findByTelefono(identifier);
         if (!trabajador.isPresent()) {
             trabajador = trabajadorRepository.findByEmail(identifier);
@@ -49,10 +51,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             );
         }
 
-        // Y este bloque antes del throw final
-// Admin hardcodeado para desarrollo
+        // Admin hardcodeado para desarrollo
         if (identifier.equals("admin@puntooficio.com")) {
-            // La password se valida igual por BCrypt, se carga desde properties o hardcodeada
             String adminPassword = "$2a$10$BU9GTmDcWrqcUeb7oyVyEuoqnnmScCaVzb3SwGjLaJhSIkE6qXclW"; // "admin1234"
             return new CustomUserDetails(0L, identifier, adminPassword, Role.ADMIN);
         }

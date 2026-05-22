@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class LoginRequestDto {
     private String identifier; // email para Cliente, telefono para Trabajador
+    private String email;
     private String password;
 }

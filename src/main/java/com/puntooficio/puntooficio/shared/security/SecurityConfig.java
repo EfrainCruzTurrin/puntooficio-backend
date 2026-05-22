@@ -4,6 +4,7 @@ import com.puntooficio.puntooficio.shared.userdetails.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -40,9 +41,29 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Públicos: Auth
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        // Públicos: Archivos estáticos (imágenes subidas)
+                        .requestMatchers("/uploads/**").permitAll()  // ← agregar esta línea
+
+                        // Públicos: Datos maestros
+                        .requestMatchers("/api/categorias/**").permitAll()
+                        .requestMatchers("/api/subcategorias/**").permitAll()
+                        .requestMatchers("/api/ciudades/**").permitAll()
+
+                        // Públicos: Trabajadores (perfil y listado)
+                        .requestMatchers("/api/trabajadores/*/perfil").permitAll()
+                        .requestMatchers("/api/trabajadores/lista").permitAll()
+
+                        // Públicos: Reseñas (solo lectura por trabajador)
+                        .requestMatchers(HttpMethod.GET, "/api/resenas/trabajador/**").permitAll()
+
+                        // Dev tools
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
@@ -63,7 +84,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(passwordEncoder());
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

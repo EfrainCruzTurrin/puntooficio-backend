@@ -3,6 +3,9 @@ package com.puntooficio.puntooficio.auth.dtos.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+import java.util.Set;
+
 @Getter
 @Setter
 public class TrabajadorRegisterRequestDto {
@@ -12,7 +15,8 @@ public class TrabajadorRegisterRequestDto {
     private String password;
     private String dni;
     private String fotoPerfil;
-    private String ciudad;
+    private Long ciudadId;
     private Long categoriaId;
     private String email;
+    private Set<Long> subcategoriaIds;
 }

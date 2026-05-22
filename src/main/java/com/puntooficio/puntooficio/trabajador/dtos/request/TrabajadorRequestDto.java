@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +21,9 @@ public class TrabajadorRequestDto {
     private String apellido;
 
     @NotBlank
+    private String email;
+
+    @NotBlank
     private String telefono;
 
     @NotBlank @Size(min=8)
@@ -29,9 +34,10 @@ public class TrabajadorRequestDto {
 
     private String fotoPerfil;
 
-    @NotBlank
-    private String ciudad;
-
     @NotNull
+    private Long ciudadId;
+
     private Long categoriaId;
+
+    private Set<Long> subcategoriaIds;
 }

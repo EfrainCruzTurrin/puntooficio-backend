@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ResenaRepository extends JpaRepository<Resena, Long> {
     Page<Resena> findByTrabajadorId(Long trabajadorId, Pageable pageable);
+    boolean existsByTrabajadorIdAndClienteId(Long trabajadorId, Long clienteId);
 }

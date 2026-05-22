@@ -1,6 +1,7 @@
 package com.puntooficio.puntooficio.categoria.services.impl.domain;
 
 import com.puntooficio.puntooficio.categoria.dtos.request.CategoriaRequestDto;
+import com.puntooficio.puntooficio.categoria.dtos.response.CategoriaConSubcategoriasResponseDto;
 import com.puntooficio.puntooficio.categoria.dtos.response.CategoriaResponseDto;
 import com.puntooficio.puntooficio.categoria.mappers.CategoriaMapper;
 import com.puntooficio.puntooficio.categoria.models.Categoria;
@@ -8,10 +9,12 @@ import com.puntooficio.puntooficio.categoria.repositories.CategoriaRepository;
 import com.puntooficio.puntooficio.categoria.services.interfaces.domain.ICategoriaService;
 import com.puntooficio.puntooficio.shared.exceptions.DuplicateResourceException;
 import com.puntooficio.puntooficio.shared.exceptions.ResourceNotFoundException;
+import com.puntooficio.puntooficio.subcategoria.mappers.SubcategoriaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +24,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
 
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper categoriaMapper;
+    private final SubcategoriaMapper subcategoriaMapper;
 
 
     @Override
@@ -63,8 +67,24 @@ public class CategoriaServiceImpl implements ICategoriaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria", id));
         categoriaRepository.delete(categoria);
     }
+
     @Override
     public Page<CategoriaResponseDto> findAll(Pageable pageable) {
         return categoriaRepository.findAll(pageable).map(categoriaMapper::toResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoriaConSubcategoriasResponseDto> findAllConSubcategorias() {
+        return categoriaRepository.findAll().stream()
+                .map(cat -> CategoriaConSubcategoriasResponseDto.builder()
+                        .id(cat.getId())
+                        .nombre(cat.getNombre())
+                        .descripcion(cat.getDescripcion())
+                        .subcategorias(cat.getSubcategorias().stream()
+                                .map(subcategoriaMapper::toResponseDto)
+                                .toList())
+                        .build())
+                .toList();
     }
 }

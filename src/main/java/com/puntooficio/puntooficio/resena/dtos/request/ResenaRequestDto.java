@@ -13,7 +13,7 @@ public class ResenaRequestDto {
     @NotNull @Min(1) @Max(5)
     private Integer puntaje;
     private String comentario;
-    private LocalDateTime fechaCreacion;
+
     @NotNull
     private Long trabajadorId;
     @NotNull

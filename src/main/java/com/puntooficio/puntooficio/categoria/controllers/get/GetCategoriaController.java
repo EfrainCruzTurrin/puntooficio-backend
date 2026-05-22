@@ -1,6 +1,7 @@
 // controllers/get/GetCategoriaController.java
 package com.puntooficio.puntooficio.categoria.controllers.get;
 
+import com.puntooficio.puntooficio.categoria.dtos.response.CategoriaConSubcategoriasResponseDto;
 import com.puntooficio.puntooficio.categoria.dtos.response.CategoriaResponseDto;
 import com.puntooficio.puntooficio.categoria.services.interfaces.domain.ICategoriaService;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,11 @@ public class GetCategoriaController {
     @GetMapping
     public ResponseEntity<Page<CategoriaResponseDto>> findAll(Pageable pageable) {
         return ResponseEntity.ok(categoriaService.findAll(pageable));
+    }
+
+    // Endpoint usado por el SubcategoriaSelector del frontend
+    @GetMapping("/con-subcategorias")
+    public ResponseEntity<List<CategoriaConSubcategoriasResponseDto>> findAllConSubcategorias() {
+        return ResponseEntity.ok(categoriaService.findAllConSubcategorias());
     }
 }

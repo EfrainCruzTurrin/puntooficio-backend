@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+    // Para buscar por nombre exacto (útil para el DataInitializer)
     boolean existsByNombre(String nombre);
 }

@@ -7,6 +7,8 @@ import com.puntooficio.puntooficio.auth.dtos.response.AuthResponseDto;
 import com.puntooficio.puntooficio.auth.services.interfaces.IAuthService;
 import com.puntooficio.puntooficio.categoria.models.Categoria;
 import com.puntooficio.puntooficio.categoria.repositories.CategoriaRepository;
+import com.puntooficio.puntooficio.ciudad.models.Ciudad;
+import com.puntooficio.puntooficio.ciudad.repositories.CiudadRepository;
 import com.puntooficio.puntooficio.cliente.models.Cliente;
 import com.puntooficio.puntooficio.cliente.repositories.ClienteRepository;
 import com.puntooficio.puntooficio.shared.enums.Role;
@@ -15,16 +17,18 @@ import com.puntooficio.puntooficio.shared.exceptions.ResourceNotFoundException;
 import com.puntooficio.puntooficio.shared.security.JwtService;
 import com.puntooficio.puntooficio.shared.userdetails.CustomUserDetails;
 import com.puntooficio.puntooficio.shared.userdetails.CustomUserDetailsService;
+import com.puntooficio.puntooficio.subcategoria.models.Subcategoria;
+import com.puntooficio.puntooficio.subcategoria.repositories.SubcategoriaRepository;
 import com.puntooficio.puntooficio.trabajador.models.Trabajador;
 import com.puntooficio.puntooficio.trabajador.repositories.TrabajadorRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,8 @@ public class AuthServiceImpl implements IAuthService {
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final SubcategoriaRepository subcategoriaRepository;
+    private final CiudadRepository ciudadRepository;
 
     @Override
     public AuthResponseDto login(LoginRequestDto dto) {
@@ -75,8 +81,6 @@ public class AuthServiceImpl implements IAuthService {
         if (trabajadorRepository.existsByDni(dto.getDni())) {
             throw new DuplicateResourceException("Ya existe un trabajador con el DNI: " + dto.getDni());
         }
-        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria", dto.getCategoriaId()));
 
         Trabajador trabajador = new Trabajador();
         trabajador.setNombre(dto.getNombre());
@@ -85,16 +89,29 @@ public class AuthServiceImpl implements IAuthService {
         trabajador.setPassword(passwordEncoder.encode(dto.getPassword()));
         trabajador.setDni(dto.getDni());
         trabajador.setFotoPerfil(dto.getFotoPerfil());
-        trabajador.setCiudad(dto.getCiudad());
+        if (dto.getCiudadId() != null) {
+            Ciudad ciudad = ciudadRepository.findById(dto.getCiudadId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Ciudad", dto.getCiudadId()));
+            trabajador.setCiudad(ciudad);
+        }
         trabajador.setPerfilVerificado(false);
-        trabajador.setCategoria(categoria);
         trabajador.setEmail(dto.getEmail());
+
+
+
+
+        if (dto.getSubcategoriaIds() != null && !dto.getSubcategoriaIds().isEmpty()) {
+            Set<Subcategoria> subcategorias = new HashSet<>(subcategoriaRepository.findAllById(dto.getSubcategoriaIds()));
+            trabajador.setSubcategorias(subcategorias);
+        }
+
         Trabajador saved = trabajadorRepository.save(trabajador);
 
         CustomUserDetails userDetails = new CustomUserDetails(
-                saved.getId(), saved.getTelefono(), saved.getPassword(), Role.TRABAJADOR
+                saved.getId(), saved.getEmail(), saved.getPassword(), Role.TRABAJADOR
         );
         return new AuthResponseDto(jwtService.generateToken(userDetails), Role.TRABAJADOR.name(), saved.getId());
     }
+
 
 }

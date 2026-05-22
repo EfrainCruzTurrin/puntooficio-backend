@@ -3,6 +3,7 @@ package com.puntooficio.puntooficio.trabajador.services.impl.domain;
 import com.puntooficio.puntooficio.categoria.dtos.response.CategoriaResponseDto;
 import com.puntooficio.puntooficio.categoria.models.Categoria;
 import com.puntooficio.puntooficio.categoria.repositories.CategoriaRepository;
+import com.puntooficio.puntooficio.ciudad.models.Ciudad;
 import com.puntooficio.puntooficio.trabajador.dtos.request.TrabajadorRequestDto;
 import com.puntooficio.puntooficio.trabajador.dtos.response.TrabajadorResponseDto;
 import com.puntooficio.puntooficio.trabajador.mappers.TrabajadorMapper;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 class TrabajadorServiceImplTest {
@@ -54,11 +56,13 @@ class TrabajadorServiceImplTest {
         trabajador.setNombre("Juan");
         trabajador.setApellido("Pérez");
         trabajador.setTelefono("3511234567");
-        trabajador.setCiudad("Córdoba");
+        Ciudad ciudad = new Ciudad();
+        ciudad.setNombre("Córdoba");
+        trabajador.setCiudad(ciudad);
 
         CategoriaResponseDto categoriaDto = new CategoriaResponseDto(1L, "Carpintería", "Servicios de madera");
         responseDto = new TrabajadorResponseDto(1L, "Juan", "Pérez", "3511234567", categoriaDto, "Córdoba", false, null);
-        requestDto = new TrabajadorRequestDto("Juan", "Pérez", "3511234567", "password123", "12345678", null, "Córdoba", 1L);
+        requestDto = new TrabajadorRequestDto("Juan", "Pérez", "juan@test.com", "3511234567", "password123", "12345678", null, 1L, 1L, null);
     }
 
     @Test
@@ -94,7 +98,7 @@ class TrabajadorServiceImplTest {
     @Test
     void create_debeGuardarYRetornarDto() {
         when(passwordEncoder.encode(any())).thenReturn("hashedPassword");
-        when(trabajadorMapper.toEntity(requestDto)).thenReturn(trabajador);
+        when(trabajadorMapper.toEntity(eq(requestDto), any(Ciudad.class))).thenReturn(trabajador);
         when(trabajadorRepository.save(trabajador)).thenReturn(trabajador);
         when(trabajadorMapper.toResponseDto(trabajador)).thenReturn(responseDto);
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(new Categoria()));

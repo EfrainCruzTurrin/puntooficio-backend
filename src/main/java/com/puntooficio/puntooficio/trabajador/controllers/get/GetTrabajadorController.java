@@ -1,15 +1,15 @@
 // trabajador/controllers/get/GetTrabajadorController.java
 package com.puntooficio.puntooficio.trabajador.controllers.get;
 
+import com.puntooficio.puntooficio.trabajador.dtos.response.TrabajadorPerfilResponseDto;
 import com.puntooficio.puntooficio.trabajador.dtos.response.TrabajadorResponseDto;
 import com.puntooficio.puntooficio.trabajador.services.interfaces.domain.ITrabajadorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/trabajadores")
@@ -26,8 +26,16 @@ public class GetTrabajadorController {
         return ResponseEntity.ok(trabajadorService.findById(id));
     }
 
+
     @GetMapping
     public ResponseEntity<Page<TrabajadorResponseDto>> findAll(Pageable pageable) {
         return ResponseEntity.ok(trabajadorService.findAll(pageable));
     }
+
+    @GetMapping("/test/hash")
+    public String hash() {
+        return new BCryptPasswordEncoder().encode("123456");
+    }
+
+
 }

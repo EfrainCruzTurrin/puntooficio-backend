@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class DeleteTrabajadorController {
 
     private final ITrabajadorService trabajadorService;
-
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('TRABAJADOR') and #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('TRABAJADOR') and #id == authentication.principal.id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         trabajadorService.delete(id);
         return ResponseEntity.noContent().build();
